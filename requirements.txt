@@ -1,5 +1,6 @@
 # requirements.txt
-Flask==1.0.2
+flask
 pandas==0.23.4
 numpy==1.15.1
 scipy==1.1.0
+gunicorn
