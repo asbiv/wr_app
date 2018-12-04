@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<a href="/db/table/{{table_name}}">Back to table</a><br/>
+{% if col_stats %}
+<pre>
+--------------------------
+MIN:    {{col_stats.min}}
+MAX:    {{col_stats.max}}
+MEAN:   {{col_stats.mean}}
+--------------------------
+</pre>
+{% endif %}
+    
+<div id="barchart"></div>
+
+{% endblock %}
+
+{% block scripts %}
+
+// Barchart
+var data = [
+  {
+    x: {{ col_values | tojson | safe }},
+    y: {{ col_counts | tojson | safe }},
+    type: 'bar'
+  }
+];
+
+Plotly.newPlot('barchart', data);
+
+
+{% endblock %}
