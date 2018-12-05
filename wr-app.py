@@ -1,3 +1,4 @@
+import os
 from flask import Flask, flash, redirect, render_template, request, session, abort
 import pandas as pd
 import numpy as np
@@ -89,5 +90,6 @@ def docs():
 	return render_template(
 		'docs.html')
 
-if __name__ == "__main__":
-	app.run(debug=True)
+if __name__ == '__main__':
+	port = int(os.environ.get("PORT", 5000))
+	app.run(host='0.0.0.0', port=port)
