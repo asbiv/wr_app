@@ -54,7 +54,6 @@ std_size_23 = [1531, 1465, 1276, 1079, 1010, 945, 912, 838]
 
 @app.route('/')
 def main():
-	#2. Store assumptions as dict?
 	initial_assumptions = {'order_inter': 0.5,
 	               'lead_time': 1.0,
 	               'service_level': 0.95,
@@ -68,7 +67,8 @@ def main():
 	savings = round(output['total_savings'].sum() * 12, 2)
 	waste_delta = round(output['target_delta'].sum() * 12, 2)
 	return render_template("main.html", data=output.to_html(),
-		savings=savings, waste_delta=waste_delta, assumptions=assumptions)
+		savings=savings, waste_delta=waste_delta,
+		assumptions=initial_assumptions)
 
 #Submit form
 @app.route('/handle_data', methods=['POST'])
@@ -84,7 +84,8 @@ def handle_data():
 	savings = round(output['total_savings'].sum() * 12, 2)
 	waste_delta = round(output['target_delta'].sum() * 12, 2)
 	return render_template("main.html", data=output.to_html(),
-		savings=savings, waste_delta=waste_delta, assumptions=assumptions)
+		savings=savings, waste_delta=waste_delta,
+		assumptions=assumptions)
 
 
 @app.route("/docs")
