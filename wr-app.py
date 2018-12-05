@@ -81,7 +81,9 @@ def handle_data():
 				   'wacc': float(request.form['wacc'])}
 	output = udf.calculate_waste(sdb_23, assumptions, 23, std_size_23)
 	savings = round(output['total_savings'].sum() * 12, 2)
-	return render_template("main.html", data=output.to_html(), savings=savings,
+	waste_delta = round(output['target_delta'].sum() * 12, 2)
+	return render_template("main.html", data=output.to_html(),
+		savings=savings, waste_delta=waste_delta,
 		assumptions=assumptions)
 
 
