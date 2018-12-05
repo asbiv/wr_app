@@ -1,5 +1,4 @@
 from flask import Flask, flash, redirect, render_template, request, session, abort
-import xlrd
 import pandas as pd
 import numpy as np
 import udf as udf
@@ -7,11 +6,38 @@ import udf as udf
 app = Flask(__name__)
 
 #NONSENSE
-sdb_dat = pd.read_excel('data/SKU excercise File v1.5 - send out.xlsx',
-                        sheet_name=3, skiprows=2)
+#sdb_dat = pd.read_excel('data/SKU excercise File v1.5 - send out.xlsx',
+#                        sheet_name=3, skiprows=2)
 #Clean up column names
-sdb_dat.columns = [c.lower().replace(' ', '_') for c in sdb_dat.columns]
+#sdb_dat.columns = [c.lower().replace(' ', '_') for c in sdb_dat.columns]
 
+#NEW NONSENSE
+df = pd.read_csv('data/SDB_2018-2.csv', encoding="ISO-8859-1")
+df.columns = ['Unnamed: 0', 'Sales Org', 'European Customer', 'Sold to Customer',
+       'Ship To Country', 'Type', 'confi', 'size', 'Die Reference',
+       'Board Type', 'Board Item', 'WRK Filter', 'Grade', 'Certification', 'x',
+       ' new Cal + width', 'Category', 'old Cal + width', 'Unchanged?', 'GSM',
+       'Caliper', 'new std width mm', 'std width mm', 'std width',
+       'Std Width Round (in)', 'optimum width', 'optimum width (in)',
+       'optimum std?', 'repeat', 'NB ON', 'x.1', 'producer 2019',
+       'Forecast Quantity board MT - OCT 2018',
+       'Forecast Quantity board MT - NOV 2018',
+       'Forecast Quantity board MT - DEC 2018',
+       'Forecast Quantity board MT - JAN 2019',
+       'Forecast Quantity board MT - FEB 2019',
+       'Forecast Quantity board MT - MAR 2019',
+       'Forecast Quantity board MT - APR 2019',
+       'Forecast Quantity board MT - MAY 2019',
+       'Forecast Quantity board MT - JUN 2019',
+       'Forecast Quantity board MT - JUL 2019',
+       'Forecast Quantity board MT - AUG 2019',
+       'Forecast Quantity board MT - SEP 2019',
+       'Forecast Quantity board MT - Q1 2019',
+       'Forecast Quantity board MT - Q2 2019',
+       'Forecast Quantity board MT - Q3 2019',
+       'Forecast Quantity board MT - Q4 2019',
+       'Forecast Quantity board MT - FY 2019', 'Average', 'Standarddeviation']
+df.columns = [c.lower().replace(' ', '_') for c in df.columns]
 
 #TODO
 #1. Read in data from GH
@@ -20,7 +46,7 @@ sdb_dat.columns = [c.lower().replace(' ', '_') for c in sdb_dat.columns]
 #df = pd.read_csv(url, skiprows=2) #preserving original form
 
 #EXAMPLE WITH CALIPER 23
-sdb_23 = sdb_dat[(sdb_dat.caliper == 23)]
+sdb_23 = df[(df.caliper == 23)]
 
 #Standard sizes for 23
 std_size_23 = [1531, 1465, 1276, 1079, 1010, 945, 912, 838]
