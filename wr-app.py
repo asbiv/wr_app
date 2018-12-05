@@ -66,8 +66,9 @@ def main():
 	#Re-create the outputs table
 	output = udf.calculate_waste(sdb_23, initial_assumptions, 23, std_size_23)
 	savings = round(output['total_savings'].sum() * 12, 2)
-	return render_template("main.html", data=output.to_html(), savings=savings,
-		assumptions=initial_assumptions)
+	waste_delta = round(output['target_delta'].sum() * 12, 2)
+	return render_template("main.html", data=output.to_html(),
+		savings=savings, waste_delta=waste_delta, assumptions=assumptions)
 
 #Submit form
 @app.route('/handle_data', methods=['POST'])
@@ -83,8 +84,7 @@ def handle_data():
 	savings = round(output['total_savings'].sum() * 12, 2)
 	waste_delta = round(output['target_delta'].sum() * 12, 2)
 	return render_template("main.html", data=output.to_html(),
-		savings=savings, waste_delta=waste_delta,
-		assumptions=assumptions)
+		savings=savings, waste_delta=waste_delta, assumptions=assumptions)
 
 
 @app.route("/docs")
