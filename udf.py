@@ -173,3 +173,55 @@ def calculate_waste(sdb_dat, assumptions, caliper, std_size_input):
     
     #Return the DF
     return(group_sel_size)
+
+
+###DIFFERENCE DELTA FUNCTIONS
+
+def get_delta_cost(caliper_subset_df):
+    '''
+    NOTE: Assumes column order is consistent for inputs
+    Takes the complete df subset by caliper
+    Creates a df of cost based on the delta in widths * forecast quantity
+    '''
+    #Group and sum by std_width_mm
+    tmp = pd.DataFrame(caliper_subset_df.iloc[:, np.r_[22,32:44]].groupby('std_width_mm').sum()).sum(axis=1)
+    df = pd.DataFrame({'std_width_mm': tmp.index, 'forecast': tmp}).reset_index(drop=True)
+    
+    #Create delta table
+    df_ = pd.DataFrame(index=tmp.index, columns=tmp.index)
+    
+    for i in range(0,len(df_.index)):
+        for j in range(0,len(df_.columns)):
+            #Index at i, column at j
+            df_.iloc[i, j] = df_.iloc[j].name - df_.iloc[i].name
+    
+    #Remove negative values
+    df_[df_ <= 0] = np.NaN
+    
+    #Create delta cost
+    delta_cost = df_.copy()
+    
+    for i in range(0,len(delta_cost.index)):
+        for j in range(0,len(delta_cost.columns)):
+            #Index at i, column at j
+            delta_cost.iloc[i, j] = df_.iloc[i, j] * df[(df.std_width_mm == df_.iloc[j].name)]['forecast'].values[0]
+    return(delta_cost)
+
+def get_remove_order(delta_cost):
+    '''
+    Takes the delta_cost df produced by get_delta_cost
+    Creates an ordered list for subsetting n standard sizes, where the index position
+        0 is dropped first, 1 dropped second etc until n=1 is the max size only
+    '''
+    #Find max index val
+    max_index_val = max(delta_cost.index)
+    #Reassign names for readability
+    delta_cost.index = delta_cost.index.map(lambda x: str(x) + '_row')
+    delta_cost.columns = delta_cost.columns.map(lambda x: str(x) + '_col')
+    
+    #Remove sequentially
+    min_ref = pd.DataFrame({'min': delta_cost.min(), 'idxmin': delta_cost.idxmin()}).sort_values(by=['min'])
+    ordered_removal_list = list(min_ref['idxmin'].str[:-4].dropna().astype(int))
+    #Append the max value
+    ordered_removal_list.append(max_index_val)
+    return(ordered_removal_list)
