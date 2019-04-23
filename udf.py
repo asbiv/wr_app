@@ -16,10 +16,12 @@ def sqrt_of_ss(values):
 #CORE FUNCTIONS
 def find_nearest_size(std_size_input, sdb_dat):
     '''
-    Takes the array of stantard sizes and the SDB data
+    Takes the array of standard sizes and the SDB data
     Returns the SDB data with the sel_size column of the
         the nearest standard size within 100mm
     Exceptions for Caliper 23 are HARDCODED into this function
+    '''
+    
     '''
     std_size_col = []
     
@@ -40,14 +42,33 @@ def find_nearest_size(std_size_input, sdb_dat):
             std_size_col.append(i)
     
     sdb_dat['sel_size'] = std_size_col
+    '''
+    
+    sel_size = []
+    
+    #l1 = [100, 200, 300, 400]
+    #std = [400, 200]
+    
+    for existing in sdb_dat['std_width_mm']:#l1:
+        diff = []
+        for standard in std_size_input:#std:
+            if standard >= existing:
+                diff.append(standard)
+        #print(diff)
+        #print(np.argmin(diff))
+        sel_size.append(diff[np.argmin(diff)])
+        
+    sdb_dat['sel_size'] = sel_size
+
+
     
     #HARDCODED EXCEPTIONS:
     #715 becomes 838
-    sdb_dat['sel_size'][(sdb_dat.std_width_mm == 715)] = 838
+    #sdb_dat['sel_size'][(sdb_dat.std_width_mm == 715)] = 838
     #960 stays the same
-    sdb_dat['sel_size'][(sdb_dat.std_width_mm == 960)] = 960
+    #sdb_dat['sel_size'][(sdb_dat.std_width_mm == 960)] = 960
     #1394 stays the same
-    sdb_dat['sel_size'][(sdb_dat.std_width_mm == 1394)] = 1394
+    #sdb_dat['sel_size'][(sdb_dat.std_width_mm == 1394)] = 1394
     return(sdb_dat)
 
 
