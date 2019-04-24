@@ -43,7 +43,6 @@ def find_nearest_size(std_size_input, sdb_dat):
     
     sdb_dat['sel_size'] = std_size_col
     '''
-    
     sel_size = []
     
     #l1 = [100, 200, 300, 400]
@@ -59,7 +58,7 @@ def find_nearest_size(std_size_input, sdb_dat):
         sel_size.append(diff[np.argmin(diff)])
         
     sdb_dat['sel_size'] = sel_size
-
+    
 
     
     #HARDCODED EXCEPTIONS:
