@@ -1,6 +1,6 @@
 import os
 import sys
-from flask import Flask, flash, redirect, render_template, request, session, abort
+from flask import Flask, flash, redirect, render_template, request, session, abort, jsonify
 import pandas as pd
 import numpy as np
 import udf as udf
@@ -19,6 +19,7 @@ dat = pd.read_csv('data/SDB_2018-2.csv', encoding="ISO-8859-1")
 dat.columns = [c.lstrip().rstrip().lower().replace(' ', '_') for c in dat.columns]
 
 initial_assumptions = {
+        'caliper_num': 23,
         'num_skus': 15,
         'order_inter': 0.5,
         'lead_time': 1.0,
@@ -26,19 +27,22 @@ initial_assumptions = {
         'inv_cost': 8,
         'waste_trim': 400,
         'waste_wacc': 800,
-        'wacc': 0.08,
-        'caliper': 23}
-    
-sdb_23 = dat[(dat.caliper == initial_assumptions['caliper'])].reset_index(drop=True)
-
-#Standard sizes for 23
-std_size = udf.get_remove_order(udf.get_delta_cost(sdb_23))
+        'wacc': 0.08
+        }
 
 @app.route('/')
 def main():
-    std_size_23 = std_size[initial_assumptions['num_skus']:] #[1531, 1465, 1276, 1079, 1010, 945, 912, 838]
+    def build_data(assumptions):
+        sdb_data = dat[(dat.caliper == assumptions['caliper_num'])].reset_index(drop=True)
+        std_size = udf.get_remove_order(udf.get_delta_cost(sdb_data))
+        skus_removed = len(std_size) - assumptions['num_skus']
+        std_size_sdb = std_size[skus_removed:] #[1531, 1465, 1276, 1079, 1010, 945, 912, 838]
+        return(sdb_data, std_size_sdb)
+
+    sdb_data, std_size_sdb = build_data(initial_assumptions)
+
     #Re-create the outputs table
-    output = udf.calculate_waste(sdb_23, initial_assumptions, 23, std_size_23)
+    output = udf.calculate_waste(sdb_data, initial_assumptions, initial_assumptions['caliper_num'], std_size_sdb)
     savings = round(output['total_savings'].sum() * 12, 2)
     waste_delta = round(output['target_delta'].sum() * 12, 2)
     return render_template("main.html",
@@ -49,9 +53,11 @@ def main():
     
 
 #Submit form
-@app.route('/handle_data', methods=['POST'])
+@app.route('/handle_data', methods=['POST', 'GET'])
 def handle_data():
-    assumptions = {'num_skus': int(request.form['num_skus']),
+    #assumptions = request.get_json()
+    assumptions = {'caliper_num': int(request.form['caliper_num']),
+                   'num_skus': int(request.form['num_skus']),
                    'order_inter': float(request.form['order_inter']),
                    'lead_time': float(request.form['lead_time']),
                    'service_level': float(request.form['service_level']),
@@ -59,22 +65,25 @@ def handle_data():
                    'waste_trim': float(request.form['waste_trim']),
                    'waste_wacc': float(request.form['waste_wacc']),
                    'wacc': float(request.form['wacc'])}
-    def get_form_data_size(assumptions):
-        #tmp = assumptions['num_skus']
-        #print(tmp)
-        #std_size_23 = std_size[tmp:]
-        std_size_23 = [1531, 1465, 1276, 1079, 1010, 945, 912, 838]
-        return(std_size_23)
-    std_size_23 = get_form_data_size(assumptions)
 
-    output = udf.calculate_waste(sdb_23, assumptions, 23, std_size_23)
+    def build_data(assumptions):
+        sdb_data = dat[(dat.caliper == assumptions['caliper_num'])].reset_index(drop=True)
+        std_size = udf.get_remove_order(udf.get_delta_cost(sdb_data))
+        skus_removed = len(std_size) - assumptions['num_skus']
+        std_size_sdb = std_size[skus_removed:] #[1531, 1465, 1276, 1079, 1010, 945, 912, 838]
+        return(sdb_data, std_size_sdb)
+
+    sdb_data, std_size_sdb = build_data(assumptions)
+
+    #Re-create the outputs table
+    output = udf.calculate_waste(sdb_data, initial_assumptions, initial_assumptions['caliper_num'], std_size_sdb)
     savings = round(output['total_savings'].sum() * 12, 2)
     waste_delta = round(output['target_delta'].sum() * 12, 2)
     return render_template("main.html",
         data=output.to_html(classes=['table-bordered', 'table-responsive'],
             float_format=lambda x: '%10.2f' % x),
         savings=savings, waste_delta=waste_delta,
-        assumptions=assumptions)
+        assumptions=initial_assumptions)
 
 
 @app.route("/docs")
