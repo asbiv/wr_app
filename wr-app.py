@@ -84,13 +84,13 @@ def handle_data():
         data=output.to_html(classes=['table-bordered', 'table-responsive'],
             float_format=lambda x: '%10.2f' % x),
         savings=savings, waste_delta=waste_delta,
-        assumptions=initial_assumptions)
+        assumptions=assumptions)
 
 
-@app.route("/docs")
-def docs():
+@app.route("/caliper_sensitivity")
+def caliper_sensitivity():
     return render_template(
-        'docs.html')
+        'caliper_sensitivity.html')
 
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
