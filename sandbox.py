@@ -27,7 +27,7 @@ initial_assumptions = {'order_inter': 0.5,
                'waste_trim': 400,
                'waste_wacc': 800,
                'wacc': 0.08,
-               'caliper': 23}
+               'caliper': 21}
 
 dat_23 = dat[(dat.caliper == initial_assumptions['caliper'])].reset_index(drop=True)
 
@@ -35,7 +35,7 @@ dat_23 = dat[(dat.caliper == initial_assumptions['caliper'])].reset_index(drop=T
 test_size = get_remove_order(get_delta_cost(dat_23))[3:] #Drop 3 values
 
 #Re-create the outputs table
-output = calculate_waste(dat_23, initial_assumptions, 23, test_size)
+output = calculate_waste(dat_23, initial_assumptions, test_size)
 
 #Let's explore some of the data
 #Monthly savings
@@ -55,7 +55,7 @@ plot_df_savings = []
 plot_df_waste = []
 for i in range(0, len(std_size)):
     std_size_tmp = std_size[i:] #Drop i values
-    output = calculate_waste(dat_23, initial_assumptions, 23, std_size_tmp)
+    output = calculate_waste(dat_23, initial_assumptions, std_size_tmp)
     #Selected sizes df
     #sel_sizes_df.iloc[:, i] = output['sel_size']
     sel_sizes_list.append(output['sel_size'])

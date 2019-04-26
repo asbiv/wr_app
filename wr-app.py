@@ -7,13 +7,27 @@ import udf as udf
 
 app = Flask(__name__)
 
-#NONSENSE
+
+#SHARED UDFs
+def build_data(assumptions):
+    '''Ingest assumptions dict
+    Subset by caliper num
+    Produce remove order
+    Output data and SKUs subset'''
+    sdb_data = dat[(dat.caliper == assumptions['caliper_num'])].reset_index(drop=True)
+    std_size = udf.get_remove_order(udf.get_delta_cost(sdb_data))
+    skus_removed = len(std_size) - assumptions['num_skus']
+    std_size_sdb = std_size[skus_removed:] #[1531, 1465, 1276, 1079, 1010, 945, 912, 838]
+    return(sdb_data, std_size_sdb)
+
+
+#TODO - Change to upload option
 #sdb_dat = pd.read_excel('data/SKU excercise File v1.5 - send out.xlsx',
 #                        sheet_name=3, skiprows=2)
 #Clean up column names
 #sdb_dat.columns = [c.lower().replace(' ', '_') for c in sdb_dat.columns]
 
-#NEW NONSENSE
+#START
 dat = pd.read_csv('data/SDB_2018-2.csv', encoding="ISO-8859-1")
 #FORMAT COL NAMES
 dat.columns = [c.lstrip().rstrip().lower().replace(' ', '_') for c in dat.columns]
@@ -32,17 +46,11 @@ initial_assumptions = {
 
 @app.route('/')
 def main():
-    def build_data(assumptions):
-        sdb_data = dat[(dat.caliper == assumptions['caliper_num'])].reset_index(drop=True)
-        std_size = udf.get_remove_order(udf.get_delta_cost(sdb_data))
-        skus_removed = len(std_size) - assumptions['num_skus']
-        std_size_sdb = std_size[skus_removed:] #[1531, 1465, 1276, 1079, 1010, 945, 912, 838]
-        return(sdb_data, std_size_sdb)
 
     sdb_data, std_size_sdb = build_data(initial_assumptions)
 
     #Re-create the outputs table
-    output = udf.calculate_waste(sdb_data, initial_assumptions, initial_assumptions['caliper_num'], std_size_sdb)
+    output = udf.calculate_waste(sdb_data, initial_assumptions, std_size_sdb)
     savings = round(output['total_savings'].sum() * 12, 2)
     waste_delta = round(output['target_delta'].sum() * 12, 2)
     return render_template("main.html",
@@ -66,17 +74,10 @@ def handle_data():
                    'waste_wacc': float(request.form['waste_wacc']),
                    'wacc': float(request.form['wacc'])}
 
-    def build_data(assumptions):
-        sdb_data = dat[(dat.caliper == assumptions['caliper_num'])].reset_index(drop=True)
-        std_size = udf.get_remove_order(udf.get_delta_cost(sdb_data))
-        skus_removed = len(std_size) - assumptions['num_skus']
-        std_size_sdb = std_size[skus_removed:] #[1531, 1465, 1276, 1079, 1010, 945, 912, 838]
-        return(sdb_data, std_size_sdb)
-
     sdb_data, std_size_sdb = build_data(assumptions)
 
     #Re-create the outputs table
-    output = udf.calculate_waste(sdb_data, initial_assumptions, initial_assumptions['caliper_num'], std_size_sdb)
+    output = udf.calculate_waste(sdb_data, assumptions, std_size_sdb)
     savings = round(output['total_savings'].sum() * 12, 2)
     waste_delta = round(output['target_delta'].sum() * 12, 2)
     return render_template("main.html",

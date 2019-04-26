@@ -94,7 +94,7 @@ def calculations_from_forecast(sdb_dat):
     '''
     tmp_forecast = sdb_dat.iloc[:, np.r_[32:44]]
     #Add index for grouping
-    tmp_forecast['index_num'] = range(1,51)
+    tmp_forecast['index_num'] = range(1,len(tmp_forecast)+1) #51)
     tmp_forecast_calc = tmp_forecast.set_index('index_num').stack().\
         groupby(['index_num']).agg({'forecast_mean': 'mean', 'forecast_sd': 'std'}).reset_index()
     
@@ -154,7 +154,7 @@ def build_output_table(group_sel_size, assumptions):
     return(group_sel_size)
 
 
-def calculate_waste(sdb_dat, assumptions, caliper, std_size_input):
+def calculate_waste(sdb_dat, assumptions, std_size_input):
     '''
     Calls the following functions IN ORDER
         find_nearest_size
