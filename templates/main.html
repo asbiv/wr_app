@@ -4,17 +4,62 @@
 
 <div class="row">
 	<div class="col-sm-3 form-group">
-		<h2>Form</h2>
-		<form action="{{ url_for('handle_data') }}" method="POST">
-			<div class="form-group">
+		<h3>Form</h3>
+		<form action="{{ url_for('handle_graph') }}" method="POST">
+			<!--<div class="form-group">
 				<label>Caliper number</label>
-				<input class="form-control" type="number" name="caliper_num" value=23 step="any">
+				<input class="form-control" type="number" name="caliper_num" value={{assumptions.caliper_num}} step="any">
+			</div>-->
+			<div class="form-group">
+				<label>Example select</label>
+				<select class="form-control" type="number" name="caliper_num" value={{assumptions.caliper_num}}>
+					<option value={{assumptions.caliper_num}} selected>{{assumptions.caliper_num}}</option>
+					<option>14</option>
+					<option>16</option>
+					<option>17</option>
+					<option>18</option>
+					<option>20</option>
+					<option>21</option>
+					<option>22</option>
+					<option>23</option>
+					<option>24</option>
+					<option>25</option>
+					<option>26</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label>Order interval</label>
+				<input class="form-control" type="number" name="order_inter" value={{assumptions.order_inter}} step="any">
+			</div>
+			<div class="form-group">
+				<label>Lead time</label>
+				<input class="form-control" type="number" name="lead_time" value={{assumptions.lead_time}} step="any">
+			</div>
+			<div class="form-group">
+				<label>Service level</label>
+				<input class="form-control" type="number" name="service_level" value={{assumptions.service_level}} step="any">
+			</div>
+			<div class="form-group">
+				<label>Inventory cost (€)</label>
+				<input class="form-control" type="number" name="inv_cost" value={{assumptions.inv_cost}}>
+			</div>
+			<div class="form-group">
+				<label>Waste (trim, €)</label>
+				<input class="form-control" type="number" name="waste_trim" value={{assumptions.waste_trim}}>
+			</div>
+			<div class="form-group">
+				<label>Waste (WACC, €)</label>
+				<input class="form-control" type="number" name="waste_wacc" value={{assumptions.waste_wacc}}>
+			</div>
+			<div class="form-group">
+				<label>WACC</label>
+				<input class="form-control" type="number" name="wacc" value={{assumptions.wacc}} step="any">
 			</div>
 		<button type="submit" class="btn btn-outline-secondary">Submit</button>
 		</form>
 	</div>
 	<div class="col-sm-9">
-		<h2>Plot</h2>
+		<h3>Plot</h3>
 		<div class="chart" id="bargraph">
 			<script>
 			var graphs = {{plot | safe}};

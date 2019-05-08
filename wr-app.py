@@ -24,7 +24,8 @@ def build_data(data, assumptions):
     std_size = udf.get_remove_order(udf.get_delta_cost(sdb_data))
     skus_removed = len(std_size) - assumptions['num_skus']
     std_size_sdb = std_size[skus_removed:]
-    return(sdb_data, std_size_sdb)
+    skus_removed_list = std_size[:skus_removed]
+    return(sdb_data, std_size_sdb, skus_removed_list)
 
 def build_plot_data(data, assumptions):
     dat = build_caliper_subset(data, assumptions)
@@ -77,12 +78,33 @@ initial_assumptions = {
 def main():
     plot_df_savings_, plot_df_waste_ = build_plot_data(dat, initial_assumptions)
     bar = wrg.create_plot(plot_df_savings_, plot_df_waste_)
-    return render_template('main.html', plot=bar)
+    return render_template('main.html',
+        plot=bar,
+        assumptions=initial_assumptions)
+
+#Submit graph form
+@app.route('/handle_graph', methods=['POST', 'GET'])
+def handle_graph():
+    #assumptions = request.get_json()
+    assumptions = {'caliper_num': int(request.form['caliper_num']),
+                   'order_inter': float(request.form['order_inter']),
+                   'lead_time': float(request.form['lead_time']),
+                   'service_level': float(request.form['service_level']),
+                   'inv_cost': float(request.form['inv_cost']),
+                   'waste_trim': float(request.form['waste_trim']),
+                   'waste_wacc': float(request.form['waste_wacc']),
+                   'wacc': float(request.form['wacc'])}
+
+    plot_df_savings_, plot_df_waste_ = build_plot_data(dat, assumptions)
+    bar = wrg.create_plot(plot_df_savings_, plot_df_waste_)
+    return render_template('main.html',
+        plot=bar,
+        assumptions=assumptions)
 
 
-@app.route("/caliper_sensitivity")
+@app.route('/caliper_sensitivity')
 def caliper_sensitivity():
-    sdb_data, std_size_sdb = build_data(dat, initial_assumptions)
+    sdb_data, std_size_sdb, skus_removed = build_data(dat, initial_assumptions)
 
     #Re-create the outputs table
     output = udf.calculate_waste(sdb_data, initial_assumptions, std_size_sdb)
@@ -92,9 +114,10 @@ def caliper_sensitivity():
         data=output.to_html(classes=['table-bordered', 'table-responsive'],
             float_format=lambda x: '%10.2f' % x),
         savings=savings, waste_delta=waste_delta,
-        assumptions=initial_assumptions)
+        assumptions=initial_assumptions,
+        removed=skus_removed)
 
-#Submit form
+#Submit data form
 @app.route('/handle_data', methods=['POST', 'GET'])
 def handle_data():
     #assumptions = request.get_json()
@@ -108,7 +131,7 @@ def handle_data():
                    'waste_wacc': float(request.form['waste_wacc']),
                    'wacc': float(request.form['wacc'])}
 
-    sdb_data, std_size_sdb = build_data(dat, assumptions)
+    sdb_data, std_size_sdb, skus_removed = build_data(dat, assumptions)
 
     #Re-create the outputs table
     output = udf.calculate_waste(sdb_data, assumptions, std_size_sdb)
@@ -118,7 +141,8 @@ def handle_data():
         data=output.to_html(classes=['table-bordered', 'table-responsive'],
             float_format=lambda x: '%10.2f' % x),
         savings=savings, waste_delta=waste_delta,
-        assumptions=assumptions)
+        assumptions=assumptions,
+        removed=skus_removed)
 
 
 if __name__ == '__main__':

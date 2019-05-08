@@ -11,12 +11,12 @@ def create_plot(plot_df_savings_, plot_df_waste_):
     go.Scatter(
         x = plot_df_savings_['x'], 
         y=plot_df_savings_['y1'], 
-        name='Savings'
+        name='Savings (€)'
     ),
     go.Scatter(
         x=plot_df_waste_['x'],
         y=plot_df_waste_['y2'],
-        name='Waste', 
+        name='Waste (MT)', 
         yaxis='y2'
     ),
     ]
