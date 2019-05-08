@@ -10,57 +10,16 @@
 				<label>Caliper number</label>
 				<input class="form-control" type="number" name="caliper_num" value=23 step="any">
 			</div>
-			<div class="form-group">
-				<label>Number of SKUs</label>
-				<input class="form-control" type="number" name="num_skus" value=15 step="any">
-			</div>
-			<div class="form-group">
-				<label>Order interval</label>
-				<input class="form-control" type="number" name="order_inter" value=0.5 step="any">
-			</div>
-			<div class="form-group">
-				<label>Lead time</label>
-				<input class="form-control" type="number" name="lead_time" value=1.0 step="any">
-			</div>
-			<div class="form-group">
-				<label>Service level</label>
-				<input class="form-control" type="number" name="service_level" value=0.95 step="any">
-			</div>
-			<div class="form-group">
-				<label>Inventory cost</label>
-				<input class="form-control" type="number" name="inv_cost" value=8>
-			</div>
-			<div class="form-group">
-				<label>Waste (trim)</label>
-				<input class="form-control" type="number" name="waste_trim" value=400>
-			</div>
-			<div class="form-group">
-				<label>Waste (WACC)</label>
-				<input class="form-control" type="number" name="waste_wacc" value=800>
-			</div>
-			<div class="form-group">
-				<label>WACC</label>
-				<input class="form-control" type="number" name="wacc" value=0.08 step="any">
-			</div>
 		<button type="submit" class="btn btn-outline-secondary">Submit</button>
 		</form>
 	</div>
 	<div class="col-sm-9">
-		<h2>Data</h2>
-		{{data | safe}}
-		<br>
-		<h2>Summary</h2>
-		<div class="col-sm-6">
-			<p>
-				<b>Total Savings:</b> ${{savings | round(2, 'floor')}}
-			</p>
-			<p>
-				<b>Total Delta Waste:</b> {{waste_delta | round(2, 'floor')}} MT
-			</p>
-		</div>
-		<div class="col-sm-6">
-			<b>Input assumptions:</b><br>
-			{{assumptions | safe}}
+		<h2>Plot</h2>
+		<div class="chart" id="bargraph">
+			<script>
+			var graphs = {{plot | safe}};
+			Plotly.plot('bargraph',graphs,{});
+			</script>
 		</div>
 	</div>
 </div>

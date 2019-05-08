@@ -20,6 +20,8 @@
         <link rel="stylesheet" type="text/css"       href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css">                                                     
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
         <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+        <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
 
         <!-- Local -->
         <link rel= "stylesheet" type= "text/css" href= "{{ url_for('static',filename='styles/style.css') }}">
@@ -38,19 +40,9 @@
                         <li class="nav-item">
                             <a class="nav-link" href="/caliper_sensitivity">Caliper sensitivity</a>
                         </li>
-                        <!--
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            Demos</a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="/demos/heatmap1">Heatmap of Tasters and Countries</a>
-                                    <div class="dropdown-divider"></div>
-                            </div>
-                        </li>
-                        -->
                     </ul>
                 </div>
-            </nav>            
+            </nav>
         </div>
 
         <div id="header">
